@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3 align="center">Campaigns List</h3>
+    <a href="/add-campaign/">Add New Campaign</a>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Due Date</th>
+            <th>Link</th>
+            <th>Replies Num</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td>{{ object.title }}</td>
+                <td>{{ object.description }}</td>
+                <td>{{ object.due_date }}</td>
+                <td>{{ object.link }}</td>
+                <td>{{ object.replies_num }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

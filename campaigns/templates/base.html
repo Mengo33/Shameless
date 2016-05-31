@@ -1,0 +1,37 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        {% block title %}
+            {{ view.page_title }} | Shameless
+        {% endblock %}
+    </title>
+    <link href="{% static "bootstrap/css/bootstrap.css" %}" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+
+    <h1 align="center">
+        Shameless!
+    </h1>
+    {% if not request.path == '/login/' %}
+        <a href="/logout/">Logout</a>
+    {% endif %}
+    <div>
+
+        {% block content %}
+            CONTENT
+        {% endblock %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
