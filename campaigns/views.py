@@ -8,8 +8,8 @@ from django.views.generic import View
 from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
 
-from campaigns import forms
-from campaigns import models
+from . import forms
+from . import models
 
 
 
@@ -22,6 +22,7 @@ class LoggedInMixin:
 
 
 class LoginView(FormView):
+    page_title = "Login"
     template_name = "login.html"
     form_class = forms.LoginForm
 
@@ -60,6 +61,7 @@ class LogoutView(View):
 
 
 class CreateCampaignView(LoggedInMixin, CreateView):
+    page_title = "Campaign Adding - Form"
     model = models.Campaign
     fields = (
         'title',

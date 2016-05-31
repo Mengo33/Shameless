@@ -1,18 +1,22 @@
 import datetime
+import random
+
+from django.contrib.auth.models import User
 from django.test import TestCase
-from campaigns import models
+
+from . import models
 
 
 class CampaignsTestCase(TestCase):
     def test_campaign(self):
-        # users = [User.objects.create_user(
-        #     "user #{}".format(i + 1)) for i in range(5)]
-
+        users = [User.objects.create_user(
+            "user #{}".format(i + 1)) for i in range(5)]
 
         n = 12
         for i in range(n):
             c = models.Campaign(
-                # user_id=random.choice(users),
+                # user=User.objects.create_user("Dani", "aa@gmail.com", "dani1234"),
+                user=random.choice(users),
                 title="Expense #{}".format(i + 1),
                 description="gnbstghtrbdtfd  cjybbtbc j6 udr6uybd xycbjhd jry",
                 link="https://facebook.com",

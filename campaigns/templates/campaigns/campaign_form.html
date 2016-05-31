@@ -3,8 +3,7 @@
 
 
 {% block content %}
-    <h3 align="center">Campaign Adding - Form</h3>
-    <a href="{% url "campaigns:list" %}">Campaigns List</a>
+
     <form method="post">
         {% csrf_token %}
         {% bootstrap_form form %}

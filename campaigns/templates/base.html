@@ -16,13 +16,32 @@
 <body>
 
 <div class="container">
+<div class="navbar navbar-inverse ">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+          <div>
+                <a class="navbar-brand" href="###">Shameless <3</a>
+                <a class="navbar-brand" href="###">{{ view.page_title }}</a>
+          </div>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li class="active"><a href="/">Campaign List</a></li>
+          <li><a href="/add-campaign">Add New Campaign</a></li>
+             {% if not request.path == '/login/' %}
+                <li><a href="/logout/">Hello  {{ user.get_username }}, Logout</a></li>
+            {% endif %}
+            <li><a href="#"></a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
 
-    <h1 align="center">
-        Shameless!
-    </h1>
-    {% if not request.path == '/login/' %}
-        <a href="/logout/">Logout</a>
-    {% endif %}
     <div>
 
         {% block content %}
