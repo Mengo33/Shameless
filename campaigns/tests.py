@@ -8,7 +8,7 @@ from . import models
 
 
 class CampaignsTestCase(TestCase):
-    def test_campaign(self):
+    def test_add_campaign(self):
         users = [User.objects.create_user(
             "user #{}".format(i + 1)) for i in range(5)]
 
@@ -17,7 +17,7 @@ class CampaignsTestCase(TestCase):
             c = models.Campaign(
                 # user=User.objects.create_user("Dani", "aa@gmail.com", "dani1234"),
                 user=random.choice(users),
-                title="Expense #{}".format(i + 1),
+                title="Campaign #{}".format(i + 1),
                 description="gnbstghtrbdtfd  cjybbtbc j6 udr6uybd xycbjhd jry",
                 link="https://facebook.com",
                 due_date=datetime.date(2016, 1, i + 1),
@@ -27,3 +27,12 @@ class CampaignsTestCase(TestCase):
             c.save()
 
         self.assertEquals(models.Campaign.objects.count(), n)
+
+    # def test_add_user(self):
+    #     u = User(
+    #         username="Menahem Godick",
+    #         first_name="Menahem",
+    #         last_name="Godick",
+    #         email="m@gmail.com",
+    #         date_joined=datetime.date(2016, 1, 1),
+    #     )

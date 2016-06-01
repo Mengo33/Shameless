@@ -35,6 +35,8 @@
           <li><a href="/add-campaign">Add New Campaign</a></li>
              {% if not request.path == '/login/' %}
                 <li><a href="/logout/">Hello  {{ user.get_username }}, Logout</a></li>
+                {% else %}
+                 <li><a href="/signup/">Hello Guest, Signup</a></li>
             {% endif %}
             <li><a href="#"></a></li>
         </ul>

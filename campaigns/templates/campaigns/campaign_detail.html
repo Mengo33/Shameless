@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <a href="{% url "campaigns:list" %}">Back to all campaigns</a>
+
+    <ul class="list-group">
+        <br/>
+        <p>title:</p>
+        <li class="list-group-item">
+            {{ object.title }}
+        </li>
+        {% if object.description %}
+            <br/>
+            <p>description:</p>
+            <li class="list-group-item">
+                {{ object.description|linebreaks }}
+            </li>
+        {% endif %}
+        <br/>
+        <p>link:</p>
+        <li class="list-group-item">
+            {{ object.link }}
+        </li>
+        <br/>
+        <p>due_date:</p>
+        <li class="list-group-item">
+            {{ object.due_date }}
+        </li>
+        <br/>
+        <p>replies_num:</p>
+        <li class="list-group-item">
+          {{ object.replies_num }}
+        </li>
+    </ul>
+{% endblock %}

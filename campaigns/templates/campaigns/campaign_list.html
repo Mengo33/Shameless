@@ -10,13 +10,12 @@
             <th>Due Date</th>
             <th>Link</th>
             <th>Replies Num</th>
-
         </tr>
         </thead>
         <tbody>
         {% for object in object_list %}
             <tr>
-                <td>{{ object.title }}</td>
+                <td><a href="{{ object.get_absolute_url }}">{{ object.title }}</a></td>
                 <td>{{ object.description }}</td>
                 <td>{{ object.due_date }}</td>
                 <td>{{ object.link }}</td>
@@ -25,5 +24,20 @@
         {% endfor %}
         </tbody>
     </table>
+
+
+
+{#    <div class="table table-bordered col-ms-6" style="display: table">#}
+{#        {% for object in object_list %}#}
+{#            <a style="display: table-row" href="{{ object.get_absolute_url }}">#}
+{#                <div class="cell table-bordered" style="display: table-cell">{{ object.title }}</div>#}
+{#                <div class="cell table-bordered" style="display: table-cell">{{ object.description }}</div>#}
+{#                <div class="cell table-bordered" style="display: table-cell">{{ object.due_date }}</div>#}
+{#                <div class="cell table-bordered" style="display: table-cell">{{ object.link }}</div>#}
+{#                <div class="cell table-bordered" style="display: table-cell">{{ object.replies_num }}</div>#}
+{#            </a>#}
+{#        {% endfor %}#}
+{#    </div>#}
+
 
 {% endblock %}

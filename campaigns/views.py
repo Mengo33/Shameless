@@ -1,16 +1,17 @@
 import datetime
 
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.shortcuts import redirect
 from django.utils.encoding import escape_uri_path
 from django.views.generic import View
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
 
 from . import forms
 from . import models
-
 
 
 class LoggedInMixin:
@@ -47,7 +48,7 @@ class LoginView(FormView):
 
 
 class ListCampaignView(LoggedInMixin, ListView):
-    page_title = "campaign list"
+    page_title = "Campaign list"
     model = models.Campaign
 
     def get_queryset(self):
@@ -81,3 +82,24 @@ class CreateCampaignView(LoggedInMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
+
+class CampaignDetailView(LoggedInMixin, DetailView):
+    page_title = "Campaign Details"
+    model = models.Campaign
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
+
+class CreateCampaignUser(LoggedInMixin, CreateView):
+    page_title = "Signup"
+    model = User
+    fields = (
+        'username',
+        'password',
+        'email',
+        'first_name',
+        'last_name',
+        'date_joined',
+    )
+    success_url = reverse_lazy('campaigns:list')
