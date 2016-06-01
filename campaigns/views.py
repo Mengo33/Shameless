@@ -91,9 +91,9 @@ class CampaignDetailView(LoggedInMixin, DetailView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class CreateCampaignUser(LoggedInMixin, CreateView):
+class CreateCampaignUserView(CreateView):
     page_title = "Signup"
-    model = User
+    model = models.CampaignUser, models.CampaignUser.User
     fields = (
         'username',
         'password',

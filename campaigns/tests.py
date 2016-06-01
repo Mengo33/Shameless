@@ -28,11 +28,17 @@ class CampaignsTestCase(TestCase):
 
         self.assertEquals(models.Campaign.objects.count(), n)
 
-    # def test_add_user(self):
-    #     u = User(
-    #         username="Menahem Godick",
-    #         first_name="Menahem",
-    #         last_name="Godick",
-    #         email="m@gmail.com",
-    #         date_joined=datetime.date(2016, 1, 1),
-    #     )
+    def test_add_user(self):
+        n = 10
+        for i in range(n):
+            u = User(
+                username="Menahem Godick{}".format(i + 1),
+                first_name="Menahem",
+                last_name="Godick",
+                email="m{}@gmail.com".format(i + 1),
+                date_joined=datetime.date(2016, 1, 1),
+            )
+            u.full_clean()
+            u.save()
+
+        self.assertEquals(User.objects.count(), n)
