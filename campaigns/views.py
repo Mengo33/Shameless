@@ -3,6 +3,7 @@ import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse_lazy, reverse
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.encoding import escape_uri_path
 from django.views.generic import View
@@ -43,9 +44,6 @@ class LoginView(FormView):
                     self.request.GET['from'])  # SECURITY: check path
             return redirect('campaigns:list')
 
-        form.add_error(None, "Invalid user name or password")
-        return self.form_invalid(form)
-
 
 class ListCampaignView(LoggedInMixin, ListView):
     page_title = "Campaign list"
@@ -71,6 +69,7 @@ class CreateCampaignView(LoggedInMixin, CreateView):
         'due_date',
         'replies_num',
     )
+
     success_url = reverse_lazy('campaigns:list')
 
     def get_initial(self):
@@ -91,21 +90,61 @@ class CampaignDetailView(LoggedInMixin, DetailView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-class CreateCampaignUserView(CreateView):
+class SignupView(FormView):
     page_title = "Signup"
-    template_name = "campaigns/user_form.html"
-    # model = models.CampaignUser, models.CampaignUser.User
-    model = User
-    fields = (
-        'first_name',
-        'last_name',
-        'username',
-        'password',
-        'email',
-    )
-    success_url = reverse_lazy('campaigns:list')
+    template_name = "signup.html"
+    form_class = forms.SignupForm
 
-    def get_initial(self):
-        d = super().get_initial()
-        d['date_joined'] = datetime.date.today()
-        return d
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            return redirect('campaigns:list')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        if form.cleaned_data['password'] != form.cleaned_data.pop('password_recheck'):
+            form.add_error(None, "Passwords do not match")
+            return self.form_invalid(form)
+        user = User.objects.create_user(**form.cleaned_data)
+        user = authenticate(**form.cleaned_data)
+
+        if user is not None:
+            if user.is_active:
+                login(self.request, user)
+            else:
+                form.add_error(None, "Disabled account")
+                return self.form_invalid(form)
+            if self.request.GET.get('from'):
+                return redirect(
+                    self.request.GET['from'])  # SECURITY: check path
+            return redirect('campaigns:list')
+
+
+
+
+# class CreateCampaignUserView(CreateView):
+#     page_title = "Signup"
+#     template_name = "campaigns/user_form.html"
+#     # model = models.CampaignUser, models.CampaignUser.User
+#     model = User
+#     fields = (
+#         'first_name',
+#         'last_name',
+#         'username',
+#         'password',
+#         'email',
+#     )
+#     success_url = reverse_lazy('campaigns:list')
+#
+#     def get_initial(self):
+#         d = super().get_initial()
+#         d['date_joined'] = datetime.date.today()
+#         return d
+#
+#     def form_valid(self, form):
+#         User.objects.create_user(form.cleaned_data['username'], password=form.cleaned_data['password'],
+#                                  email=form.cleaned_data['email'])
+#         # user.last_name = form.cleaned_data['last_name']
+#         # user = form.instance
+#         # password = form.cleaned_data['password']
+#         # user.set_password(password)
+#         return HttpResponse(self.success_url)

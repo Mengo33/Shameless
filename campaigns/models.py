@@ -22,5 +22,5 @@ class CampaignUser(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
-    is_customr = models.BooleanField(default=False)
+    is_customer = models.BooleanField(default=False)
     is_writer = models.BooleanField(default=False)
