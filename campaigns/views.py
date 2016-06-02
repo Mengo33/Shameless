@@ -37,12 +37,18 @@ class LoginView(FormView):
         user = authenticate(username=form.cleaned_data['username'],
                             password=form.cleaned_data['password'])
 
-        if user is not None and user.is_active:
-            login(self.request, user)
-            if self.request.GET.get('from'):
-                return redirect(
-                    self.request.GET['from'])  # SECURITY: check path
-            return redirect('campaigns:list')
+        if user is not None:
+            if user.is_active:
+                login(self.request, user)
+                if self.request.GET.get('from'):
+                    return redirect(
+                        self.request.GET['from'])  # SECURITY: check path
+            else:
+                form.add_error(None, "User isn't active anymore - plz contact admin")
+                return self.form_invalid(form)
+        else:
+            form.add_error(None, "username doesn't exist")
+            return self.form_invalid(form)
 
 
 class ListCampaignView(LoggedInMixin, ListView):
@@ -117,34 +123,3 @@ class SignupView(FormView):
                 return redirect(
                     self.request.GET['from'])  # SECURITY: check path
             return redirect('campaigns:list')
-
-
-
-
-# class CreateCampaignUserView(CreateView):
-#     page_title = "Signup"
-#     template_name = "campaigns/user_form.html"
-#     # model = models.CampaignUser, models.CampaignUser.User
-#     model = User
-#     fields = (
-#         'first_name',
-#         'last_name',
-#         'username',
-#         'password',
-#         'email',
-#     )
-#     success_url = reverse_lazy('campaigns:list')
-#
-#     def get_initial(self):
-#         d = super().get_initial()
-#         d['date_joined'] = datetime.date.today()
-#         return d
-#
-#     def form_valid(self, form):
-#         User.objects.create_user(form.cleaned_data['username'], password=form.cleaned_data['password'],
-#                                  email=form.cleaned_data['email'])
-#         # user.last_name = form.cleaned_data['last_name']
-#         # user = form.instance
-#         # password = form.cleaned_data['password']
-#         # user.set_password(password)
-#         return HttpResponse(self.success_url)
