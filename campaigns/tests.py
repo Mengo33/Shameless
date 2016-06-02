@@ -32,11 +32,12 @@ class CampaignsTestCase(TestCase):
         n = 10
         for i in range(n):
             u = User(
-                username="Menahem Godick{}".format(i + 1),
+                username="Menahem432{}".format(i + 1),
+                password="Menahem{}".format((i + 1) * 111),
                 first_name="Menahem",
                 last_name="Godick",
                 email="m{}@gmail.com".format(i + 1),
-                date_joined=datetime.date(2016, 1, 1),
+                # date_joined=datetime.date(2016, 1, 1),
             )
             u.full_clean()
             u.save()

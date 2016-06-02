@@ -93,13 +93,19 @@ class CampaignDetailView(LoggedInMixin, DetailView):
 
 class CreateCampaignUserView(CreateView):
     page_title = "Signup"
-    model = models.CampaignUser, models.CampaignUser.User
+    template_name = "campaigns/user_form.html"
+    # model = models.CampaignUser, models.CampaignUser.User
+    model = User
     fields = (
+        'first_name',
+        'last_name',
         'username',
         'password',
         'email',
-        'first_name',
-        'last_name',
-        'date_joined',
     )
     success_url = reverse_lazy('campaigns:list')
+
+    def get_initial(self):
+        d = super().get_initial()
+        d['date_joined'] = datetime.date.today()
+        return d

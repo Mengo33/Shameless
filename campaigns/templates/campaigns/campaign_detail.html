@@ -6,29 +6,29 @@
 
     <ul class="list-group">
         <br/>
-        <p>title:</p>
+        <p class="campaign_label">title:</p>
         <li class="list-group-item">
             {{ object.title }}
         </li>
         {% if object.description %}
             <br/>
-            <p>description:</p>
+            <p class="campaign_label">description:</p>
             <li class="list-group-item">
                 {{ object.description|linebreaks }}
             </li>
         {% endif %}
         <br/>
-        <p>link:</p>
+        <p class="campaign_label">link:</p>
         <li class="list-group-item">
             {{ object.link }}
         </li>
         <br/>
-        <p>due_date:</p>
+        <p class="campaign_label">due date:</p>
         <li class="list-group-item">
             {{ object.due_date }}
         </li>
         <br/>
-        <p>replies_num:</p>
+        <p class="campaign_label">replies num:</p>
         <li class="list-group-item">
           {{ object.replies_num }}
         </li>

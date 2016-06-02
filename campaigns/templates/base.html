@@ -12,6 +12,15 @@
         {% endblock %}
     </title>
     <link href="{% static "bootstrap/css/bootstrap.css" %}" rel="stylesheet">
+    <style>
+        li{
+            color: darkcyan;
+        }
+        .campaign_label{
+            color: darkolivegreen;
+            font-size: large;
+        }
+</style>
 </head>
 <body>
 
@@ -33,11 +42,13 @@
         <ul class="nav navbar-nav navbar-right">
           <li class="active"><a href="/">Campaign List</a></li>
           <li><a href="/add-campaign">Add New Campaign</a></li>
-             {% if not request.path == '/login/' %}
-                <li><a href="/logout/">Hello  {{ user.get_username }}, Logout</a></li>
-                {% else %}
-                 <li><a href="/signup/">Hello Guest, Signup</a></li>
-            {% endif %}
+             {% if not request.path == '/login/' and not request.path == '/signup/' %}
+                    <li><a href="/logout/">Hello  {{ user.get_username }}, Logout</a></li>
+                {% elif request.path == '/login/' %}
+                    <li><a href="/signup/">Hello Guest, Signup</a></li>
+                 {% elif request.path == '/signup/' %}
+                    <li><a href="/login/">Hello Guest, Login</a></li>
+             {% endif %}
             <li><a href="#"></a></li>
         </ul>
       </div><!--/.nav-collapse -->
