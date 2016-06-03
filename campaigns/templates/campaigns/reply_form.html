@@ -1,12 +1,7 @@
 {% extends "base.html" %}
 {% load bootstrap3 %}
 
-{% block title %}
-    <p>Reply to campihndfg {{  }}</p>
-{% endblock %}
-
 {% block content %}
-
     <form method="post">
         {% csrf_token %}
         {% bootstrap_form form %}

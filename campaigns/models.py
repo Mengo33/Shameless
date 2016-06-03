@@ -17,11 +17,10 @@ class Gender:
 class ProfileUser(models.Model):
     user = models.OneToOneField(
         User,
-        on_delete=models.CASCADE,
-        primary_key=True,
-    )
-    gender = models.IntegerField(choices=Gender.choices)
-    dob = models.DateField()
+        on_delete=models.CASCADE,)
+
+    gender = models.IntegerField(choices=Gender.choices, null=True, blank=True)
+    dob = models.DateField(null=True, blank=True)
     country = models.CharField(max_length=50, null=True, blank=True)
     address = models.CharField(max_length=100, null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)
@@ -35,16 +34,14 @@ class ProfileUser(models.Model):
 class CampaignUser(models.Model):
     profile_user = models.OneToOneField(
         ProfileUser,
-        on_delete=models.CASCADE,
-        primary_key=True, )
+        on_delete=models.CASCADE,)
     # TODO
 
 
 class WriterUser(models.Model):
     profile_user = models.OneToOneField(
         ProfileUser,
-        on_delete=models.CASCADE,
-        primary_key=True, )
+        on_delete=models.CASCADE, )
     # TODO
 
 
@@ -52,13 +49,16 @@ class Campaign(models.Model):
     owner = models.ForeignKey(CampaignUser)
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=500)
-    link = models.CharField(max_length=100)  # TODO URLfield
+    link = models.URLField()
     due_date = models.DateField()
     replies_num = models.IntegerField(default=1)
     replies_left = models.IntegerField(default=1)
 
     def get_absolute_url(self):
         return reverse("campaigns:campaign_details", args=(self.pk,))
+
+    # def get_absolute_url(self):
+    #     return reverse("campaigns:create_reply", args=(self.pk,))
 
     def __str__(self):
         return "Campaign {} ({} replies left)".format(

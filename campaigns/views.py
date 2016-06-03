@@ -1,10 +1,8 @@
 import datetime
 
-from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse_lazy, reverse
-from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.encoding import escape_uri_path
 from django.views.generic import View
@@ -50,6 +48,7 @@ class LoginView(FormView):
         else:
             form.add_error(None, "username doesn't exist")
             return self.form_invalid(form)
+        return redirect('campaigns:list')
 
 
 class ListCampaignView(LoggedInMixin, ListView):
@@ -57,7 +56,8 @@ class ListCampaignView(LoggedInMixin, ListView):
     model = models.Campaign
 
     def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
+        return super().get_queryset().filter(
+            owner=models.CampaignUser.objects.get(profile_user_id=self.request.user.pk))
 
 
 class LogoutView(View):
@@ -82,12 +82,15 @@ class CreateCampaignView(LoggedInMixin, CreateView):
     def get_initial(self):
         d = super().get_initial()
         d['due_date'] = datetime.date.today()
+        # d['owner_id'] = self.request.user
         return d
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        form.instance.owner = models.CampaignUser.objects.get(
+            profile_user_id=self.request.user.pk)
+
         resp = super().form_valid(form)
-        messages.SUCCESS(self.request, "Campaign added successfully.") #TODO formating
+        # messages.SUCCESS(self.request, "Campaign added successfully.") #TODO formating
         return resp
 
 
@@ -96,7 +99,8 @@ class CampaignDetailView(LoggedInMixin, DetailView):
     model = models.Campaign
 
     def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
+        return super().get_queryset().filter(
+            owner=models.CampaignUser.objects.get(profile_user_id=self.request.user.pk))
 
 
 class SignupView(FormView):
@@ -116,6 +120,20 @@ class SignupView(FormView):
         user = User.objects.create_user(**form.cleaned_data)
         user = authenticate(**form.cleaned_data)
 
+        # Add new user to ProfileUser and CampaignUser Or WriterUser
+        pu = models.ProfileUser(user=user, )
+        pu.full_clean()
+        pu.save()
+
+        cu = models.CampaignUser(profile_user=pu, )
+        cu.full_clean()
+        cu.save()
+
+        wu = models.WriterUser(profile_user=pu, )
+        wu.full_clean()
+        wu.save()
+
+        # Login
         if user is not None:
             if user.is_active:
                 login(self.request, user)
@@ -129,16 +147,26 @@ class SignupView(FormView):
 
 
 class CreateReplyView(LoggedInMixin, CreateView):
-    # page_title = "Reply to Campaign {}".format()
-    # page_title = self.request.pk_url_kwarg['pk']
+    page_title = "Replay to campaign "
+    campaign = None
     model = models.Reply
     fields = (
         'reply_text',
     )
 
-
     success_url = reverse_lazy('campaigns:list')
 
+    def dispatch(self, request, *args, **kwargs):
+        campaign_name = (models.Campaign.objects.get(pk=escape_uri_path(request.path)[1])).title
+        self.page_title += '"' + campaign_name + '"'
+        self.campaign = (models.Campaign.objects.get(pk=escape_uri_path(request.path)[1]))
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
-        form.instance.user = self.request.user
-        return super().form_valid(form)
+        form.instance.writer = models.WriterUser.objects.get(
+            profile_user_id=self.request.user.pk)
+        form.instance.campaign = self.campaign
+        resp = super().form_valid(form)
+        # messages.SUCCESS(self.request, "Campaign added successfully.") #TODO formating
+        return resp
+
