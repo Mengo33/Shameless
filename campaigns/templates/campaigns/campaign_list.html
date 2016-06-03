@@ -1,7 +1,8 @@
 {% extends "base.html" %}
+{% load staticfiles bootstrap3 %}
 
 {% block content %}
-
+    {% bootstrap_messages %}
     <table class="table table-bordered col-ms-6">
         <thead>
         <tr>
@@ -24,20 +25,5 @@
         {% endfor %}
         </tbody>
     </table>
-
-
-
-{#    <div class="table table-bordered col-ms-6" style="display: table">#}
-{#        {% for object in object_list %}#}
-{#            <a style="display: table-row" href="{{ object.get_absolute_url }}">#}
-{#                <div class="cell table-bordered" style="display: table-cell">{{ object.title }}</div>#}
-{#                <div class="cell table-bordered" style="display: table-cell">{{ object.description }}</div>#}
-{#                <div class="cell table-bordered" style="display: table-cell">{{ object.due_date }}</div>#}
-{#                <div class="cell table-bordered" style="display: table-cell">{{ object.link }}</div>#}
-{#                <div class="cell table-bordered" style="display: table-cell">{{ object.replies_num }}</div>#}
-{#            </a>#}
-{#        {% endfor %}#}
-{#    </div>#}
-
 
 {% endblock %}

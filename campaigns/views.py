@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse_lazy, reverse
@@ -85,7 +86,9 @@ class CreateCampaignView(LoggedInMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        return super().form_valid(form)
+        resp = super().form_valid(form)
+        messages.SUCCESS(self.request, "Campaign added successfully.") #TODO formating
+        return resp
 
 
 class CampaignDetailView(LoggedInMixin, DetailView):
@@ -123,3 +126,19 @@ class SignupView(FormView):
                 return redirect(
                     self.request.GET['from'])  # SECURITY: check path
             return redirect('campaigns:list')
+
+
+class CreateReplyView(LoggedInMixin, CreateView):
+    # page_title = "Reply to Campaign {}".format()
+    # page_title = self.request.pk_url_kwarg['pk']
+    model = models.Reply
+    fields = (
+        'reply_text',
+    )
+
+
+    success_url = reverse_lazy('campaigns:list')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
