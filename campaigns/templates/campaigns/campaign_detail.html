@@ -4,7 +4,10 @@
 
     <a href="{% url "campaigns:list" %}">Back to all campaigns</a>
     &nbsp;
-    <a href="add-reply">Add reply</a>
+{#    <a href="view-replies">View Replies</a>#}
+     <a href="{% url "campaigns:replies_list" %}">View replies</a>
+    &nbsp;
+    <a href="add-reply">Add Reply</a>
     <ul class="list-group">
         <br/>
         <p class="campaign_label">title:</p>

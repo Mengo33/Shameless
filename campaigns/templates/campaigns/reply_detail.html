@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+        <a href="{% url "campaigns:replies_list" %}">Back to all replies</a>
+    &nbsp;
+{#    <a href="^view-replies$">View Replies</a>#}
+    <ul class="list-group">
+        <br/>
+        <p class="campaign_label">writer:</p>
+        <li class="list-group-item">
+            {{ object.writer.profile_user.user.get_full_name }}
+        </li>
+        <br/>
+        <p class="campaign_label">campaign:</p>
+        <li class="list-group-item">
+            {{ object.campaign.title }}
+        </li>
+        <br/>
+        <p class="campaign_label">status:</p>
+        <li class="list-group-item">
+            {{ object.status }}
+        </li>
+        <br/>
+        <p class="campaign_label">created at:</p>
+        <li class="list-group-item">
+            {{ object.created_at }}
+        </li>
+        <br/>
+        <p class="campaign_label">posted at:</p>
+        <li class="list-group-item">
+            {{ object.posted_at }}
+        </li>
+        <br/>
+        <p class="campaign_label">reply link:</p>
+        <li class="list-group-item">
+            {{ object.reply_link }}
+        </li>
+        <br/>
+        <p class="campaign_label">reply text:</p>
+        <li class="list-group-item">
+            {{ object.reply_text|linebreaks }}
+        </li>
+    </ul>
+{% endblock %}

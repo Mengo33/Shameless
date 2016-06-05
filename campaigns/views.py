@@ -54,6 +54,7 @@ class LoginView(FormView):
 class ListCampaignView(LoggedInMixin, ListView):
     page_title = "Campaign list"
     model = models.Campaign
+    paginate_by = 5
 
     def get_queryset(self):
         return super().get_queryset().filter(
@@ -98,9 +99,18 @@ class CampaignDetailView(LoggedInMixin, DetailView):
     page_title = "Campaign Details"
     model = models.Campaign
 
-    def get_queryset(self):
-        return super().get_queryset().filter(
-            owner=models.CampaignUser.objects.get(profile_user_id=self.request.user.pk))
+    def dispatch(self, request, *args, **kwargs):
+        self.request.session['campaign_id'] = kwargs['pk']
+        return super().dispatch(request, *args, **kwargs)
+        #
+        # def get_queryset(self):
+        #     return super().get_queryset().filter(
+        #         owner=models.CampaignUser.objects.get(profile_user_id=self.request.user.pk))
+
+
+class ReplyDetailView(LoggedInMixin, DetailView):
+    page_title = "Reply Details"
+    model = models.Reply
 
 
 class SignupView(FormView):
@@ -117,21 +127,30 @@ class SignupView(FormView):
         if form.cleaned_data['password'] != form.cleaned_data.pop('password_recheck'):
             form.add_error(None, "Passwords do not match")
             return self.form_invalid(form)
+
+        is_campaigner, is_writer = form.cleaned_data.pop('is_campaigner'), form.cleaned_data.pop('is_writer')
+        if is_campaigner == is_writer:
+            form.add_error(None, "User must be a campaigner or writer (not both).")
+            return self.form_invalid(form)
+
         user = User.objects.create_user(**form.cleaned_data)
         user = authenticate(**form.cleaned_data)
-
         # Add new user to ProfileUser and CampaignUser Or WriterUser
         pu = models.ProfileUser(user=user, )
         pu.full_clean()
         pu.save()
+        if is_campaigner:
+            cu = models.CampaignUser(profile_user=pu, )
+            cu.full_clean()
+            cu.save()
+            #TODO - add a line to log
+        if is_writer:
+            wu = models.WriterUser(profile_user=pu, )
+            wu.full_clean()
+            wu.save()
+            #TODO - add a line to log
 
-        cu = models.CampaignUser(profile_user=pu, )
-        cu.full_clean()
-        cu.save()
 
-        wu = models.WriterUser(profile_user=pu, )
-        wu.full_clean()
-        wu.save()
 
         # Login
         if user is not None:
@@ -147,7 +166,7 @@ class SignupView(FormView):
 
 
 class CreateReplyView(LoggedInMixin, CreateView):
-    page_title = "Replay to campaign "
+    page_title = "Reply to campaign "
     campaign = None
     model = models.Reply
     fields = (
@@ -157,9 +176,10 @@ class CreateReplyView(LoggedInMixin, CreateView):
     success_url = reverse_lazy('campaigns:list')
 
     def dispatch(self, request, *args, **kwargs):
-        campaign_name = (models.Campaign.objects.get(pk=escape_uri_path(request.path)[1])).title
-        self.page_title += '"' + campaign_name + '"'
-        self.campaign = (models.Campaign.objects.get(pk=escape_uri_path(request.path)[1]))
+        campaign_name = (models.Campaign.objects.get(pk=kwargs['pk'])).title
+        # self.request.user.pk)).title
+        self.page_title += '"{}"'.format(campaign_name)
+        self.campaign = (models.Campaign.objects.get(pk=kwargs['pk']))
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -170,3 +190,24 @@ class CreateReplyView(LoggedInMixin, CreateView):
         # messages.SUCCESS(self.request, "Campaign added successfully.") #TODO formating
         return resp
 
+
+class ListRepliesView(LoggedInMixin, ListView):
+    page_title = "Replies list"
+    model = models.Reply
+    paginate_by = 5
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            campaign=models.Campaign.objects.get(pk=self.request.session['campaign_id']))
+
+# class CreateProfileUserView(LoggedInMixin, CreateView):
+#     page_title = "Edit Profile Details"
+#     model = models.ProfileUser
+#     fields = (
+#         'email'
+#         'phone'
+#     )
+#
+#     def get_initial(self):
+#         f = super().get_initial()
+#         f['']

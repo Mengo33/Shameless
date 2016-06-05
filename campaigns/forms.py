@@ -13,3 +13,6 @@ class SignupForm(forms.Form):
     password = forms.CharField(max_length=300, widget=forms.PasswordInput())
     password_recheck = forms.CharField(max_length=300, widget=forms.PasswordInput())
     email = forms.EmailField(max_length=300)
+    is_campaigner = forms.BooleanField(required=False)
+    is_writer = forms.BooleanField(required=False)
+

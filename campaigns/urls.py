@@ -8,4 +8,6 @@ urlpatterns = [
     url(r'^add-campaign/$', views.CreateCampaignView.as_view(), name="create_campaign"),
     url(r'^(?P<pk>\d+)/$', views.CampaignDetailView.as_view(), name="campaign_details"),
     url(r'^(?P<pk>\d+)/add-reply/$', views.CreateReplyView.as_view(), name="create_reply"),
+    url(r'^(?P<pk>\d+)/reply_details/$', views.ReplyDetailView.as_view(), name="reply_details"),
+    url(r'^view-replies/$', views.ListRepliesView.as_view(), name="replies_list"),
 ]

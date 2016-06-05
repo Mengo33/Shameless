@@ -57,9 +57,6 @@ class Campaign(models.Model):
     def get_absolute_url(self):
         return reverse("campaigns:campaign_details", args=(self.pk,))
 
-    # def get_absolute_url(self):
-    #     return reverse("campaigns:create_reply", args=(self.pk,))
-
     def __str__(self):
         return "Campaign {} ({} replies left)".format(
             self.title,
@@ -93,6 +90,9 @@ class Reply(models.Model):
     posted_at = models.DateField(null=True, blank=True)
     reply_link = models.CharField(max_length=100, null=True, blank=True)
     status = models.IntegerField(choices=Status.choices, default=Status.CREATED)
+
+    def get_absolute_url(self):
+        return reverse("campaigns:reply_details", args=(self.pk,))
 
     def __str__(self):
         return "Reply {} owner {} status {}".format(
