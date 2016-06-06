@@ -26,7 +26,7 @@ class CampaignsTestCase(TestCase):
                 "user@{}".format(i + 1))
             u.full_clean()
             u.save()
-            pu = models.ProfileUser(user=u,
+            pu = models.ProfileUser(profile_user=u,
                                     gender=models.Gender.FEMALE,
                                     dob=datetime.date(1980, i + 1, i + 1))
             pu.full_clean()
@@ -43,7 +43,7 @@ class CampaignsTestCase(TestCase):
             u.full_clean()
             u.save()
 
-            pu = models.ProfileUser(user=u,
+            pu = models.ProfileUser(profile_user=u,
                                     gender=models.Gender.FEMALE,
                                     dob=datetime.date(1980, i + 1, i + 1))
             pu.full_clean()
@@ -64,7 +64,7 @@ class CampaignsTestCase(TestCase):
             u.full_clean()
             u.save()
 
-            pu = models.ProfileUser(user=u,
+            pu = models.ProfileUser(profile_user=u,
                                     gender=models.Gender.FEMALE,
                                     dob=datetime.date(1980, i + 1, i + 1))
             pu.full_clean()
@@ -97,7 +97,7 @@ class CampaignsTestCase(TestCase):
             u.full_clean()
             u.save()
 
-            pu = models.ProfileUser(user=u,
+            pu = models.ProfileUser(profile_user=u,
                                     gender=models.Gender.FEMALE,
                                     dob=datetime.date(1980, i + 1, i + 1))
             pu.full_clean()

@@ -16,7 +16,7 @@ class Gender:
 
 
 class ProfileUser(models.Model):
-    user = models.OneToOneField(
+    profile_user = models.OneToOneField(
         User,
         on_delete=models.CASCADE, )
 

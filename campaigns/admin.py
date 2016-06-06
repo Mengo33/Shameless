@@ -27,7 +27,7 @@ class CampaignAdmin(admin.ModelAdmin):
 
 class ProfileUserAdmin(admin.ModelAdmin):
     list_display = (
-        'user',
+        'profile_user',
     )
 
 

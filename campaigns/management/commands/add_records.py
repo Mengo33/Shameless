@@ -26,7 +26,7 @@ class Command(BaseCommand):
         # u.full_clean()
         # u.save()
         #
-        # pu = models.ProfileUser(user=u,
+        # pu = models.ProfileUser(profile_user=u,
         #                         gender=models.Gender.FEMALE,
         #                         dob=datetime.date(1980, 7, 7))
         # pu.full_clean()

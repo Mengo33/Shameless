@@ -16,8 +16,16 @@ from . import models
 
 class LoggedInMixin:
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():  # or not models.CampaignUser.objects.filter(pk=request.user.pk).exists():
+        if not request.user.is_authenticated():
             url = reverse("login") + "?from=" + escape_uri_path(request.path)
+            return redirect(url)
+        return super().dispatch(request, *args, **kwargs)
+
+
+class CampaignerOutMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if not models.CampaignUser.objects.filter(campaign_user=request.user.pk).exists():
+            url = reverse("/") + "?from=" + escape_uri_path(request.path)
             return redirect(url)
         return super().dispatch(request, *args, **kwargs)
 
@@ -96,8 +104,11 @@ class CreateCampaignView(LoggedInMixin, CreateView):
         return d
 
     def form_valid(self, form):
-        # if models.CampaignUser.objects.get(campaign_user_id=self.request.user.pk).exists():
-        form.instance.owner = models.CampaignUser.objects.get(campaign_user_id=self.request.user.pk)
+        pupk = models.ProfileUser.objects.get(profile_user_id=self.request.user.pk).pk
+        if models.CampaignUser.objects.filter(campaign_user_id=pupk).exists():
+            form.instance.owner = models.CampaignUser.objects.filter(campaign_user_id=pupk)
+        else:
+            form.instance.owner = models.CampaignUser(campaign_user=models.ProfileUser())
         resp = super().form_valid(form)
         # messages.SUCCESS(self.request, "Campaign added successfully.") #TODO formating
         return resp
@@ -142,7 +153,7 @@ class SignupView(FormView):
         user = authenticate(**form.cleaned_data)
 
         # Add new user to ProfileUser
-        pu = models.ProfileUser(user=user, )
+        pu = models.ProfileUser(profile_user=user, )
         pu.full_clean()
         pu.save()
 
@@ -173,7 +184,7 @@ class SignupView(FormView):
             return redirect('campaigns:list')
 
 
-class CreateReplyView(LoggedInMixin, CreateView):
+class CreateReplyView(CampaignerOutMixin, LoggedInMixin, CreateView):
     page_title = "Reply to campaign "
     campaign = None
     model = models.Reply
@@ -182,7 +193,6 @@ class CreateReplyView(LoggedInMixin, CreateView):
     )
 
     success_url = reverse_lazy('campaigns:list')
-
 
     def form_valid(self, form):
         form.instance.writer = models.WriterUser.objects.get(
@@ -196,7 +206,8 @@ class CreateReplyView(LoggedInMixin, CreateView):
             c.save()
         elif c.replies_left == 0:
             resp = super().form_invalid(form)
-            #TODO check if no replies left before to try adding one..
+            form.add_error(None, "No more reply option left.")
+            # TODO check if no replies left before to try adding one..
 
         # messages.SUCCESS(self.request, "Campaign added successfully.") #TODO formating
         return resp
@@ -232,11 +243,6 @@ class ListRepliesView(LoggedInMixin, ListView):
         else:
             return super().get_queryset().filter(
                 campaign=models.Campaign.objects.get(pk=self.request.session['campaign_id']))
-
-
-
-
-
 
 # class CreateProfileUserView(LoggedInMixin, CreateView):
 #     page_title = "Edit Profile Details"
