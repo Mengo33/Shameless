@@ -1,7 +1,8 @@
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
+
+from . import models as my_models
 
 
 class Gender:
@@ -17,7 +18,7 @@ class Gender:
 class ProfileUser(models.Model):
     user = models.OneToOneField(
         User,
-        on_delete=models.CASCADE,)
+        on_delete=models.CASCADE, )
 
     gender = models.IntegerField(choices=Gender.choices, null=True, blank=True)
     dob = models.DateField(null=True, blank=True)
@@ -32,14 +33,14 @@ class ProfileUser(models.Model):
 
 
 class CampaignUser(models.Model):
-    profile_user = models.OneToOneField(
+    campaign_user = models.OneToOneField(
         ProfileUser,
-        on_delete=models.CASCADE,)
+        on_delete=models.CASCADE, )
     # TODO
 
 
 class WriterUser(models.Model):
-    profile_user = models.OneToOneField(
+    writer_user = models.OneToOneField(
         ProfileUser,
         on_delete=models.CASCADE, )
     # TODO
@@ -52,7 +53,7 @@ class Campaign(models.Model):
     link = models.URLField()
     due_date = models.DateField()
     replies_num = models.IntegerField(default=1)
-    replies_left = models.IntegerField(default=1)
+    replies_left = models.IntegerField(default=replies_num)
 
     def get_absolute_url(self):
         return reverse("campaigns:campaign_details", args=(self.pk,))
@@ -92,7 +93,7 @@ class Reply(models.Model):
     status = models.IntegerField(choices=Status.choices, default=Status.CREATED)
 
     def get_absolute_url(self):
-        return reverse("campaigns:reply_details", args=(self.pk,))
+            return reverse("campaigns:reply_details", args=(self.pk,))
 
     def __str__(self):
         return "Reply {} owner {} status {}".format(

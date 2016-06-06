@@ -32,7 +32,7 @@ class Command(BaseCommand):
         # pu.full_clean()
         # pu.save()
         #
-        # cu = models.CampaignUser(profile_user=pu, )
+        # cu = models.CampaignUser(campaign_user=pu, )
         # cu.full_clean()
         # cu.save()
         #

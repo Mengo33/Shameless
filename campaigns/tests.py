@@ -49,7 +49,7 @@ class CampaignsTestCase(TestCase):
             pu.full_clean()
             pu.save()
 
-            cu = models.CampaignUser(profile_user=pu, )
+            cu = models.CampaignUser(campaign_user=pu, )
             cu.full_clean()
             cu.save()
         self.assertEquals(models.CampaignUser.objects.count(), n)
@@ -70,7 +70,7 @@ class CampaignsTestCase(TestCase):
             pu.full_clean()
             pu.save()
 
-            cu = models.CampaignUser(profile_user=pu, )
+            cu = models.CampaignUser(campaign_user=pu, )
             cu.full_clean()
             cu.save()
 
@@ -103,7 +103,7 @@ class CampaignsTestCase(TestCase):
             pu.full_clean()
             pu.save()
 
-            cu = models.CampaignUser(profile_user=pu, )
+            cu = models.CampaignUser(campaign_user=pu, )
             cu.full_clean()
             cu.save()
 
@@ -118,7 +118,7 @@ class CampaignsTestCase(TestCase):
             c.full_clean()
             c.save()
 
-            wu = models.WriterUser(profile_user=pu, )
+            wu = models.WriterUser(writer_user=pu, )
             wu.full_clean()
             wu.save()
 

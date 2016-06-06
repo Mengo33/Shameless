@@ -16,7 +16,7 @@ from . import models
 
 class LoggedInMixin:
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated():  # or not models.CampaignUser.objects.filter(pk=request.user.pk).exists():
             url = reverse("login") + "?from=" + escape_uri_path(request.path)
             return redirect(url)
         return super().dispatch(request, *args, **kwargs)
@@ -28,7 +28,7 @@ class LoginView(FormView):
     form_class = forms.LoginForm
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated():  # and models.CampaignUser.objects.filter(pk=request.user.pk).exists():
             return redirect('campaigns:list')
         return super().dispatch(request, *args, **kwargs)
 
@@ -48,6 +48,13 @@ class LoginView(FormView):
         else:
             form.add_error(None, "username doesn't exist")
             return self.form_invalid(form)
+
+        # check if User is_campaigner or is_writer
+        # if isinstance(models.CampaignUser(user), models.CampaignUser):
+        #     self.request.session['is_campaigner'] = True
+        # if isinstance(models.WriterUser(user), models.WriterUser):
+        #     self.request.session['is_writer'] = True
+
         return redirect('campaigns:list')
 
 
@@ -57,8 +64,11 @@ class ListCampaignView(LoggedInMixin, ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        return super().get_queryset().filter(
-            owner=models.CampaignUser.objects.get(profile_user_id=self.request.user.pk))
+        if not models.CampaignUser.objects.filter(campaign_user_id=self.request.user.pk).exists():
+            return super().get_queryset().all()
+        else:
+            return super().get_queryset().filter(
+                owner=models.CampaignUser.objects.get(campaign_user_id=self.request.user.pk))
 
 
 class LogoutView(View):
@@ -83,13 +93,11 @@ class CreateCampaignView(LoggedInMixin, CreateView):
     def get_initial(self):
         d = super().get_initial()
         d['due_date'] = datetime.date.today()
-        # d['owner_id'] = self.request.user
         return d
 
     def form_valid(self, form):
-        form.instance.owner = models.CampaignUser.objects.get(
-            profile_user_id=self.request.user.pk)
-
+        # if models.CampaignUser.objects.get(campaign_user_id=self.request.user.pk).exists():
+        form.instance.owner = models.CampaignUser.objects.get(campaign_user_id=self.request.user.pk)
         resp = super().form_valid(form)
         # messages.SUCCESS(self.request, "Campaign added successfully.") #TODO formating
         return resp
@@ -102,10 +110,6 @@ class CampaignDetailView(LoggedInMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         self.request.session['campaign_id'] = kwargs['pk']
         return super().dispatch(request, *args, **kwargs)
-        #
-        # def get_queryset(self):
-        #     return super().get_queryset().filter(
-        #         owner=models.CampaignUser.objects.get(profile_user_id=self.request.user.pk))
 
 
 class ReplyDetailView(LoggedInMixin, DetailView):
@@ -133,24 +137,28 @@ class SignupView(FormView):
             form.add_error(None, "User must be a campaigner or writer (not both).")
             return self.form_invalid(form)
 
+        # Add new user instance
         user = User.objects.create_user(**form.cleaned_data)
         user = authenticate(**form.cleaned_data)
-        # Add new user to ProfileUser and CampaignUser Or WriterUser
+
+        # Add new user to ProfileUser
         pu = models.ProfileUser(user=user, )
         pu.full_clean()
         pu.save()
+
+        # Add new user to CampaignUser Or WriterUser
         if is_campaigner:
-            cu = models.CampaignUser(profile_user=pu, )
+            cu = models.CampaignUser(campaign_user=pu, )
             cu.full_clean()
             cu.save()
-            #TODO - add a line to log
+            # self.request.session['is_campaigner'] = True
+            # TODO - add a line to log
         if is_writer:
-            wu = models.WriterUser(profile_user=pu, )
+            wu = models.WriterUser(writer_user=pu, )
             wu.full_clean()
             wu.save()
-            #TODO - add a line to log
-
-
+            # self.request.session['is_writer'] = True
+            # TODO - add a line to log
 
         # Login
         if user is not None:
@@ -175,20 +183,35 @@ class CreateReplyView(LoggedInMixin, CreateView):
 
     success_url = reverse_lazy('campaigns:list')
 
-    def dispatch(self, request, *args, **kwargs):
-        campaign_name = (models.Campaign.objects.get(pk=kwargs['pk'])).title
-        # self.request.user.pk)).title
-        self.page_title += '"{}"'.format(campaign_name)
-        self.campaign = (models.Campaign.objects.get(pk=kwargs['pk']))
-        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         form.instance.writer = models.WriterUser.objects.get(
-            profile_user_id=self.request.user.pk)
+            writer_user_id=self.request.user.pk)
         form.instance.campaign = self.campaign
         resp = super().form_valid(form)
+        c = models.Campaign.objects.get(pk=self.request.session['campaign_id'])
+        if c.replies_left:
+            c.replies_left -= 1
+            c.full_clean()
+            c.save()
+        elif c.replies_left == 0:
+            resp = super().form_invalid(form)
+            #TODO check if no replies left before to try adding one..
+
         # messages.SUCCESS(self.request, "Campaign added successfully.") #TODO formating
         return resp
+
+    def dispatch(self, request, *args, **kwargs):
+        self.request.session['campaign_id'] = kwargs['pk']
+
+        if models.CampaignUser.objects.filter(campaign_user_id=request.user.pk).exists():
+            redirect("campaigns:campaign_details", args=(self.request.session['campaign_id'],))
+
+        campaign_name = (models.Campaign.objects.get(pk=self.request.session['campaign_id'])).title
+        self.page_title += '"{}"'.format(campaign_name)
+        self.campaign = (models.Campaign.objects.get(pk=self.request.session['campaign_id']))
+
+        return super().dispatch(request, *args, **kwargs)
 
 
 class ListRepliesView(LoggedInMixin, ListView):
@@ -196,9 +219,24 @@ class ListRepliesView(LoggedInMixin, ListView):
     model = models.Reply
     paginate_by = 5
 
+    # def get_queryset(self):
+    #     return super().get_queryset().filter(
+    #         campaign=models.Campaign.objects.get(pk=self.request.session['campaign_id']))
+
     def get_queryset(self):
-        return super().get_queryset().filter(
-            campaign=models.Campaign.objects.get(pk=self.request.session['campaign_id']))
+        if not models.CampaignUser.objects.filter(campaign_user_id=self.request.user.pk).exists():
+            return super().get_queryset().filter(
+                writer=models.WriterUser.objects.filter(writer_user_id=self.request.user.pk),
+                campaign=models.Campaign.objects.get(pk=self.request.session['campaign_id']),
+            )
+        else:
+            return super().get_queryset().filter(
+                campaign=models.Campaign.objects.get(pk=self.request.session['campaign_id']))
+
+
+
+
+
 
 # class CreateProfileUserView(LoggedInMixin, CreateView):
 #     page_title = "Edit Profile Details"

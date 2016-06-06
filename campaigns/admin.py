@@ -33,12 +33,12 @@ class ProfileUserAdmin(admin.ModelAdmin):
 
 class CampaignUserAdmin(admin.ModelAdmin):
     list_display = (
-        'profile_user',
+        'campaign_user',
     )
 
 class WriterUserAdmin(admin.ModelAdmin):
     list_display = (
-        'profile_user',
+        'writer_user',
     )
 
 class ReplyAdmin(admin.ModelAdmin):

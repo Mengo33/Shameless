@@ -3,31 +3,36 @@
 
 {% block content %}
     {% bootstrap_messages %}
-    <table class="table table-bordered col-ms-6">
-        <thead>
-        <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Due Date</th>
-            <th>Link</th>
-            <th>Replies Num</th>
-            <th>Replies Left</th>
-            <th>Owner</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for object in object_list %}
+    {% if object_list %}
+
+        <table class="table table-bordered col-ms-6">
+            <thead>
             <tr>
-                <td><a href="{{ object.get_absolute_url }}">{{ object.title }}</a></td>
-                <td>{{ object.description }}</td>
-                <td>{{ object.due_date }}</td>
-                <td>{{ object.link }}</td>
-                <td>{{ object.replies_num }}</td>
-                <td>{{ object.replies_left }}</td>
-                <td>{{ object.owner.profile_user.user.get_full_name }}</td>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Due Date</th>
+                <th>Link</th>
+                <th>Replies Num</th>
+                <th>Replies Left</th>
+                <th>Owner</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for object in object_list %}
+                <tr>
+                    <td><a href="{{ object.get_absolute_url }}">{{ object.title }}</a></td>
+                    <td>{{ object.description }}</td>
+                    <td>{{ object.due_date }}</td>
+                    <td>{{ object.link }}</td>
+                    <td>{{ object.replies_num }}</td>
+                    <td>{{ object.replies_left }}</td>
+                    <td>{{ object.owner.campaign_user.user.get_full_name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 {% bootstrap_pagination page_obj %}
+     {% else %}
+        No Campaigns Yet.
+    {% endif %}
 {% endblock %}
