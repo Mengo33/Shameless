@@ -13,7 +13,7 @@
                 <th>Due Date</th>
                 <th>Link</th>
                 <th>Replies Num</th>
-                <th>Replies Left</th>
+                <th>Replies Written</th>
                 <th>Owner</th>
             </tr>
             </thead>
@@ -25,8 +25,8 @@
                     <td>{{ object.due_date }}</td>
                     <td>{{ object.link }}</td>
                     <td>{{ object.replies_num }}</td>
-                    <td>{{ object.replies_left }}</td>
-                    <td>{{ object.owner.campaign_user.user.get_full_name }}</td>
+                    <td>{{ object.replies_written }}</td>
+                    <td>{{ object.owner.campaign_user.profile_user.get_full_name }}</td>
                 </tr>
             {% endfor %}
             </tbody>

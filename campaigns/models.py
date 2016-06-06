@@ -27,6 +27,9 @@ class ProfileUser(models.Model):
     city = models.CharField(max_length=50, null=True, blank=True)
     state = models.CharField(max_length=50, null=True, blank=True)
 
+    is_campaigner = models.BooleanField(default=False)
+    is_writer = models.BooleanField(default=False)
+
     # TODO 1) add data members \ methods that aren't in models.User
     # TODO and should be in both CampaignUser & WriterUser
     # TODO 2) Ask Udi \ google about having to do this  class abstract while this is also a FK
@@ -53,7 +56,7 @@ class Campaign(models.Model):
     link = models.URLField()
     due_date = models.DateField()
     replies_num = models.IntegerField(default=1)
-    replies_left = models.IntegerField(default=replies_num)
+    replies_written = models.IntegerField(default=0)
 
     def get_absolute_url(self):
         return reverse("campaigns:campaign_details", args=(self.pk,))
@@ -61,7 +64,7 @@ class Campaign(models.Model):
     def __str__(self):
         return "Campaign {} ({} replies left)".format(
             self.title,
-            self.replies_left,
+            self.replies_written,
         )
 
 

@@ -27,25 +27,31 @@ class CampaignAdmin(admin.ModelAdmin):
 
 class ProfileUserAdmin(admin.ModelAdmin):
     list_display = (
-        'profile_user',
+        'profile_user_id',
+        'is_campaigner',
+        'is_writer',
     )
 
 
 class CampaignUserAdmin(admin.ModelAdmin):
     list_display = (
-        'campaign_user',
+        'campaign_user_id',
     )
+
 
 class WriterUserAdmin(admin.ModelAdmin):
     list_display = (
-        'writer_user',
+        'writer_user_id',
     )
+
 
 class ReplyAdmin(admin.ModelAdmin):
     list_display = (
         'writer',
+        'campaign',
         'reply_text',
     )
+
 
 admin.site.register(models.Campaign, CampaignAdmin)
 admin.site.register(models.ProfileUser, ProfileUserAdmin)
