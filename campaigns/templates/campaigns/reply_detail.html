@@ -1,12 +1,9 @@
 {% extends "base.html" %}
 
-{% block content %}
         {% block top_link_1 %}
             <a href="{% url "campaigns:replies_list" %}">Back to all replies</a>
         {% endblock %}
-
-    &nbsp;
-{#    <a href="^view-replies$">View Replies</a>#}
+{% block content %}
     <ul class="list-group">
         <br/>
         <p class="campaign_label">writer:</p>

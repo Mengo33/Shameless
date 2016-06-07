@@ -43,7 +43,7 @@
           <li>{% block top_link_2 %}{% endblock %}</li>
           <li>{% block top_link_1 %}{% endblock %}</li>
           <li class="active"><a href="/">Campaign List</a></li>
-            {% if request.session.is_campaign %}
+            {% if request.session.is_campaigner %}
                   <li><a href="/add-campaign">Add New Campaign</a></li>
             {% endif %}
              {% if not request.path == '/login/' and not request.path == '/signup/' %}
