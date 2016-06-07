@@ -40,10 +40,20 @@
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav navbar-right">
+          <li>{% block top_link_2 %}{% endblock %}</li>
+          <li>{% block top_link_1 %}{% endblock %}</li>
           <li class="active"><a href="/">Campaign List</a></li>
-          <li><a href="/add-campaign">Add New Campaign</a></li>
+            {% if request.session.is_campaign %}
+                  <li><a href="/add-campaign">Add New Campaign</a></li>
+            {% endif %}
              {% if not request.path == '/login/' and not request.path == '/signup/' %}
-                    <li><a href="/logout/">Hello  {{ user.get_username }}, Logout</a></li>
+                    <li><a href="/logout/">Hello  {{ user.get_username }} @
+                        {% if request.session.is_campaigner %}
+                            Campaigner
+                        {% elif request.session.is_writer %}
+                            Writer
+                        {% endif %}
+                            , Logout</a></li>
                 {% elif request.path == '/login/' %}
                     <li><a href="/signup/">Hello Guest, Signup</a></li>
                  {% elif request.path == '/signup/' %}

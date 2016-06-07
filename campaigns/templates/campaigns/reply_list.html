@@ -27,8 +27,8 @@
                     <td>{{ object.last_modified }}</td>
                     <td>{{ object.posted_at }}</td>
                     <td>{{ object.reply_link }}</td>
-                    <td>{{ object.status }}</td>
-                    <td>{{ object.writer.writer_user.user.get_full_name }}</td>
+                    <td>{{ object.get_status_display }}</td>
+                    <td>{{ object.writer.writer_user.profile_user.get_full_name }}</td>
                     <td>{{ object.campaign.title }}</td>
                 </tr>
             {% endfor %}

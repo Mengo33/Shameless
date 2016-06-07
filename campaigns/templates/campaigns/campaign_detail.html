@@ -1,13 +1,16 @@
 {% extends "base.html" %}
 
+    {% block top_link_1 %}
+        <a href="{% url "campaigns:replies_list" %}">View replies</a>
+    {% endblock %}
+    {% if request.session.is_writer %}
+            {% block top_link_2 %}
+                <a href="add-reply">Add Reply</a>
+            {% endblock %}
+    {% endif %}
 {% block content %}
-
-    <a href="{% url "campaigns:list" %}">Back to all campaigns</a>
-    &nbsp;
-{#    <a href="view-replies">View Replies</a>#}
-     <a href="{% url "campaigns:replies_list" %}">View replies</a>
-    &nbsp;
-    <a href="add-reply">Add Reply</a>
+{#    <a href="{% url "campaigns:list" %}">Back to all campaigns</a>#}
+{#    &nbsp;#}
     <ul class="list-group">
         <br/>
         <p class="campaign_label">title:</p>

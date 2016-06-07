@@ -192,7 +192,6 @@ class CampaignDetailView(LoggedInMixin, DetailView):
 
 class CreateReplyView(LoggedInMixin, CreateView):
     page_title = "Reply to campaign "
-    campaign = None
     model = models.Reply
     fields = (
         'reply_text',
@@ -201,9 +200,12 @@ class CreateReplyView(LoggedInMixin, CreateView):
     success_url = reverse_lazy('campaigns:list')
 
     def form_valid(self, form):
+        pu = models.ProfileUser.objects.get(
+            profile_user_id=self.request.user.pk)
         form.instance.writer = models.WriterUser.objects.get(
-            writer_user_id=self.request.user.pk)
-        form.instance.campaign = self.campaign
+            writer_user_id=pu.pk)
+
+        form.instance.campaign = models.Campaign.objects.get(pk=self.request.session['campaign_id'])
         resp = super().form_valid(form)
         c = models.Campaign.objects.get(pk=self.request.session['campaign_id'])
         if c.replies_written != c.replies_num:
@@ -221,12 +223,16 @@ class CreateReplyView(LoggedInMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.request.session['campaign_id'] = kwargs['pk']
 
-        if models.CampaignUser.objects.filter(campaign_user_id=request.user.pk).exists():
-            redirect("campaigns:campaign_details", args=(self.request.session['campaign_id'],))
+        # if models.CampaignUser.objects.filter(campaign_user_id=request.user.pk).exists():
+        if self.request.session['is_campaigner']:
+            return redirect("/")
+            # return reverse("campaigns:campaign_details",
+            #         args=(self.request.session['campaign_id'],))
 
         campaign_name = (models.Campaign.objects.get(pk=self.request.session['campaign_id'])).title
         self.page_title += '"{}"'.format(campaign_name)
-        self.campaign = (models.Campaign.objects.get(pk=self.request.session['campaign_id']))
+
+        return super().dispatch(request, *args, **kwargs)
 
 
 class ReplyDetailView(LoggedInMixin, DetailView):
@@ -239,19 +245,16 @@ class ListRepliesView(LoggedInMixin, ListView):
     model = models.Reply
     paginate_by = 5
 
-    # def get_queryset(self):
-    #     return super().get_queryset().filter(
-    #         campaign=models.Campaign.objects.get(pk=self.request.session['campaign_id']))
-
     def get_queryset(self):
-        if not models.CampaignUser.objects.filter(campaign_user_id=self.request.user.pk).exists():
-            return super().get_queryset().filter(
-                writer=models.WriterUser.objects.filter(writer_user_id=self.request.user.pk),
-                campaign=models.Campaign.objects.get(pk=self.request.session['campaign_id']),
-            )
-        else:
+        # if self.request.user.is_authenticated():
+        if self.request.session['is_campaigner']:
             return super().get_queryset().filter(
                 campaign=models.Campaign.objects.get(pk=self.request.session['campaign_id']))
+        elif self.request.session['is_writer']:
+            return super().get_queryset().filter(
+                writer=models.WriterUser.objects.get(
+                    writer_user_id=models.ProfileUser.objects.get(
+                        profile_user=self.request.user.pk)))
 
 # class CreateProfileUserView(LoggedInMixin, CreateView):
 #     page_title = "Edit Profile Details"

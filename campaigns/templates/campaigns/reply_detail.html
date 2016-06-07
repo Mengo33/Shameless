@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
+        {% block top_link_1 %}
+            <a href="{% url "campaigns:replies_list" %}">Back to all replies</a>
+        {% endblock %}
 
-        <a href="{% url "campaigns:replies_list" %}">Back to all replies</a>
     &nbsp;
 {#    <a href="^view-replies$">View Replies</a>#}
     <ul class="list-group">
         <br/>
         <p class="campaign_label">writer:</p>
         <li class="list-group-item">
-            {{ object.writer.writer_user.user.get_full_name }}
+            {{ object.writer.writer_user.profile_user.get_full_name }}
         </li>
         <br/>
         <p class="campaign_label">campaign:</p>
@@ -19,7 +21,7 @@
         <br/>
         <p class="campaign_label">status:</p>
         <li class="list-group-item">
-            {{ object.status }}
+            {{ object.get_status_display }}
         </li>
         <br/>
         <p class="campaign_label">created at:</p>
